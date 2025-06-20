@@ -1,5 +1,8 @@
 const User = require('../models/userModel');
 
+
+
+
 const getAllUsers = async (req, res) => {
   try {
     const [results] = await User.getAll();
@@ -8,6 +11,22 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const updateUser = async (req, res) => {
   const { username, email } = req.body;
@@ -19,6 +38,9 @@ const updateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+updateUser(sfsfsfsf)
 
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
