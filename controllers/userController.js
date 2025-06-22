@@ -40,7 +40,6 @@ const updateUser = async (req, res) => {
 };
 
 
-updateUser(sfsfsfsf)
 
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
