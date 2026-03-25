@@ -25,6 +25,8 @@ const router = express.Router();
 
 // ── Public Routes ─────────────────────────────────────────────────────────────
 router.get('/chapters', chapterController.getAllChapters);
+// Static route BEFORE :id routes — otherwise 'stats' is matched as an id
+router.get('/chapters/stats', authenticateToken, chapterController.getStats);
 router.get('/chapters/:id', chapterController.getChapterById);
 
 // ── Protected Routes ──────────────────────────────────────────────────────────

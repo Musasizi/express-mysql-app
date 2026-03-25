@@ -20,9 +20,9 @@ const Chapter = {
   /**
    * Insert a new chapter row.
    */
-  create: (name, description) => {
-    const sql = 'INSERT INTO chapters (name, description) VALUES (?, ?)';
-    return db.query(sql, [name, description]);
+  create: (name, description, chapter_type, status) => {
+    const sql = 'INSERT INTO chapters (name, description, chapter_type, status) VALUES (?, ?, ?, ?)';
+    return db.query(sql, [name, description, chapter_type || 'lecture', status || 'active']);
   },
 
   /**
@@ -42,11 +42,11 @@ const Chapter = {
   },
 
   /**
-   * Update a chapter's name and description.
+   * Update a chapter's name, description, type and status.
    */
-  update: (id, name, description) => {
-    const sql = 'UPDATE chapters SET name = ?, description = ? WHERE id = ?';
-    return db.query(sql, [name, description, id]);
+  update: (id, name, description, chapter_type, status) => {
+    const sql = 'UPDATE chapters SET name = ?, description = ?, chapter_type = ?, status = ? WHERE id = ?';
+    return db.query(sql, [name, description, chapter_type || 'lecture', status || 'active', id]);
   },
 
   /**
@@ -56,6 +56,31 @@ const Chapter = {
   delete: (id) => {
     const sql = 'DELETE FROM chapters WHERE id = ?';
     return db.query(sql, [id]);
+  },
+
+  /**
+   * Return aggregate stats for the dashboard:
+   *   - count per chapter_type
+   *   - count per status
+   *   - total enrolments
+   *   - recent chapters (last 5)
+   */
+  getStats: async () => {
+    const [byType] = await db.query('SELECT chapter_type, COUNT(*) AS count FROM chapters GROUP BY chapter_type');
+    const [byStatus] = await db.query('SELECT status, COUNT(*) AS count FROM chapters GROUP BY status');
+    const [[{ total: totalEnrolments }]] = await db.query('SELECT COUNT(*) AS total FROM user_chapters');
+    // Per-chapter enrolment counts — used for bar chart in Reports
+    const [enrolmentsPerChapter] = await db.query(`
+      SELECT c.name, COUNT(uc.user_id) AS enrolled
+      FROM   chapters c
+      LEFT JOIN user_chapters uc ON uc.chapter_id = c.id
+      GROUP BY c.id, c.name
+      ORDER BY enrolled DESC
+    `);
+    const [recent] = await db.query('SELECT id, name, chapter_type, status, created_at FROM chapters ORDER BY created_at DESC LIMIT 5');
+    const [[{ total: chapterTotal }]] = await db.query('SELECT COUNT(*) AS total FROM chapters');
+    const [[{ total: userTotal }]] = await db.query('SELECT COUNT(*) AS total FROM users');
+    return { byType, byStatus, enrolments: totalEnrolments, enrolmentsPerChapter, recent, chapterTotal, userTotal };
   },
 
   /**

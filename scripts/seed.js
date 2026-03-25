@@ -30,13 +30,21 @@ async function seed() {
 
     await db.execute(`
     CREATE TABLE IF NOT EXISTS chapters (
-      id          INT AUTO_INCREMENT PRIMARY KEY,
-      name        VARCHAR(150) NOT NULL,
-      description TEXT,
-      created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      id           INT AUTO_INCREMENT PRIMARY KEY,
+      name         VARCHAR(150) NOT NULL,
+      description  TEXT,
+      chapter_type ENUM('lecture','lab','tutorial','seminar','workshop') DEFAULT 'lecture',
+      status       ENUM('active','archived') DEFAULT 'active',
+      created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-    console.log('✔  Table: chapters');
+    // Add new columns if they don't exist yet (idempotent re-runs)
+    await db.execute(`
+      ALTER TABLE chapters
+        ADD COLUMN IF NOT EXISTS chapter_type ENUM('lecture','lab','tutorial','seminar','workshop') DEFAULT 'lecture',
+        ADD COLUMN IF NOT EXISTS status ENUM('active','archived') DEFAULT 'active'
+    `).catch(() => { }); // Silently skip if columns already exist
+    console.log('✔  Table: chapters (with chapter_type + status)');
 
     await db.execute(`
     CREATE TABLE IF NOT EXISTS user_chapters (
@@ -70,17 +78,20 @@ async function seed() {
     // ── Seed chapters ───────────────────────────────────────────────────────────
 
     const chapters = [
-        { name: 'Introduction to Node.js', description: 'Fundamentals of Node.js runtime, event loop, and modules.' },
-        { name: 'Express.js Basics', description: 'Building RESTful APIs with Express – routing, middleware, and error handling.' },
-        { name: 'MySQL & Relational DBs', description: 'Database design, SQL queries, joins, and transactions.' },
-        { name: 'Authentication & JWT', description: 'User auth with bcrypt password hashing and JSON Web Tokens.' },
-        { name: 'Deployment & DevOps', description: 'Containerising apps with Docker and deploying to cloud platforms.' },
+        { name: 'Introduction to Node.js', description: 'Fundamentals of Node.js runtime, event loop, and modules.', chapter_type: 'lecture', status: 'active' },
+        { name: 'Express.js Basics', description: 'Building RESTful APIs with Express – routing, middleware, and error handling.', chapter_type: 'lecture', status: 'active' },
+        { name: 'MySQL & Relational DBs', description: 'Database design, SQL queries, joins, and transactions.', chapter_type: 'lab', status: 'active' },
+        { name: 'Authentication & JWT', description: 'User auth with bcrypt password hashing and JSON Web Tokens.', chapter_type: 'tutorial', status: 'active' },
+        { name: 'Deployment & DevOps', description: 'Containerising apps with Docker and deploying to cloud platforms.', chapter_type: 'workshop', status: 'active' },
+        { name: 'React Fundamentals', description: 'Components, props, state, and hooks in React 19.', chapter_type: 'lecture', status: 'active' },
+        { name: 'REST API Design', description: 'Best practices for designing clean and scalable REST APIs.', chapter_type: 'seminar', status: 'active' },
+        { name: 'SQL Lab: Joins & Indexes', description: 'Hands-on SQL exercises covering joins, sub-queries and indexing.', chapter_type: 'lab', status: 'archived' },
     ];
 
     for (const c of chapters) {
         await db.execute(
-            'INSERT IGNORE INTO chapters (name, description) VALUES (?, ?)',
-            [c.name, c.description]
+            'INSERT IGNORE INTO chapters (name, description, chapter_type, status) VALUES (?, ?, ?, ?)',
+            [c.name, c.description, c.chapter_type, c.status]
         );
     }
     console.log(`✔  Seeded ${chapters.length} chapters`);

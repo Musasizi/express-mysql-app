@@ -16,20 +16,20 @@ const Chapter = require('../models/chapterModel');
 /**
  * POST /api/chapters
  * Create a new chapter.
- * Body: { name, description }
+ * Body: { name, description, chapter_type, status }
  */
 const createChapter = async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, chapter_type, status } = req.body;
 
   if (!name) {
     return res.status(400).json({ error: 'Chapter name is required.' });
   }
 
   try {
-    const [result] = await Chapter.create(name, description || '');
+    const [result] = await Chapter.create(name, description || '', chapter_type, status);
     res.status(201).json({
       message: 'Chapter created successfully.',
-      chapterId: result.insertId, // Return the new record's id so the client can use it
+      chapterId: result.insertId,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -68,19 +68,19 @@ const getChapterById = async (req, res) => {
 
 /**
  * PUT /api/chapters/:id
- * Update a chapter's name and description.
- * Body: { name, description }
+ * Update a chapter's name, description, type and status.
+ * Body: { name, description, chapter_type, status }
  */
 const updateChapter = async (req, res) => {
   const chapterId = req.params.id;
-  const { name, description } = req.body;
+  const { name, description, chapter_type, status } = req.body;
 
   if (!name) {
     return res.status(400).json({ error: 'Chapter name is required.' });
   }
 
   try {
-    await Chapter.update(chapterId, name, description || '');
+    await Chapter.update(chapterId, name, description || '', chapter_type, status);
     res.json({ message: 'Chapter updated successfully.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -139,6 +139,19 @@ const getUsersInChapter = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/chapters/stats
+ * Return aggregate dashboard stats: counts by type, by status, enrolments, totals.
+ */
+const getStats = async (req, res) => {
+  try {
+    const stats = await Chapter.getStats();
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createChapter,
   getAllChapters,
@@ -147,4 +160,5 @@ module.exports = {
   deleteChapter,
   addUserToChapter,
   getUsersInChapter,
+  getStats,
 };
