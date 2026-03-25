@@ -18,9 +18,9 @@
  * subsequent request.  The server verifies the signature with JWT_SECRET.
  */
 
-const User   = require('../models/userModel');
+const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
-const jwt    = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
 dotenv.config();

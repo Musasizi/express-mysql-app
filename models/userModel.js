@@ -17,7 +17,7 @@
  * We destructure it: const [rows] = await db.query(...)
  */
 
-const db     = require('../config/db');
+const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 const User = {

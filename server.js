@@ -13,15 +13,15 @@
  */
 
 const express = require('express');
-const dotenv  = require('dotenv');
-const cors    = require('cors');
+const dotenv = require('dotenv');
+const cors = require('cors');
 
 // Load environment variables from the .env file into process.env
 dotenv.config();
 
 // Import the three route groups (each is its own Express Router)
-const authRoutes    = require('./routes/authRoutes');
-const userRoutes    = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const chapterRoutes = require('./routes/chapterRoutes');
 
 // ─── Create Express Application ──────────────────────────────────────────────

@@ -11,7 +11,7 @@
  * models instead of callback functions.
  */
 
-const mysql  = require('mysql2');
+const mysql = require('mysql2');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -19,14 +19,14 @@ dotenv.config();
 // Create a pool with the credentials stored in .env
 // NEVER hard-code passwords or hostnames directly in source code!
 const pool = mysql.createPool({
-  host:     process.env.DB_HOST,     // e.g. 'localhost'
-  user:     process.env.DB_USER,     // e.g. 'root'
+  host: process.env.DB_HOST,     // e.g. 'localhost'
+  user: process.env.DB_USER,     // e.g. 'root'
   password: process.env.DB_PASSWORD, // keep this secret!
   database: process.env.DB_DATABASE, // e.g. 'academia_db'
-  port:     process.env.DB_PORT || 3306,
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,  // queue requests instead of throwing instantly
-  connectionLimit:    10,    // max simultaneous connections in the pool
-  queueLimit:         0,     // 0 = unlimited queue
+  connectionLimit: 10,    // max simultaneous connections in the pool
+  queueLimit: 0,     // 0 = unlimited queue
 });
 
 // Test the connection eagerly so we know at startup if the DB is unreachable.

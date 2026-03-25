@@ -18,7 +18,7 @@
  *  4. Attaches the decoded payload to req.user so controllers can read it
  */
 
-const jwt    = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
 dotenv.config();

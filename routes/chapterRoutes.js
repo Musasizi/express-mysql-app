@@ -17,25 +17,25 @@
  * if :id came first, "add-user" would be treated as an id value.
  */
 
-const express            = require('express');
-const chapterController  = require('../controllers/chapterController');
-const authenticateToken  = require('../middleware/authMiddleware');
+const express = require('express');
+const chapterController = require('../controllers/chapterController');
+const authenticateToken = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // ── Public Routes ─────────────────────────────────────────────────────────────
-router.get('/chapters',     chapterController.getAllChapters);
+router.get('/chapters', chapterController.getAllChapters);
 router.get('/chapters/:id', chapterController.getChapterById);
 
 // ── Protected Routes ──────────────────────────────────────────────────────────
-router.post  ('/chapters',            authenticateToken, chapterController.createChapter);
-router.put   ('/chapters/:id',        authenticateToken, chapterController.updateChapter);
-router.delete('/chapters/:id',        authenticateToken, chapterController.deleteChapter);
+router.post('/chapters', authenticateToken, chapterController.createChapter);
+router.put('/chapters/:id', authenticateToken, chapterController.updateChapter);
+router.delete('/chapters/:id', authenticateToken, chapterController.deleteChapter);
 
 // Enrol a user in a chapter  (static path BEFORE the :id pattern – see NOTE above)
-router.post('/chapters/add-user',     authenticateToken, chapterController.addUserToChapter);
+router.post('/chapters/add-user', authenticateToken, chapterController.addUserToChapter);
 
 // List users enrolled in a chapter
-router.get('/chapters/:id/users',     authenticateToken, chapterController.getUsersInChapter);
+router.get('/chapters/:id/users', authenticateToken, chapterController.getUsersInChapter);
 
 module.exports = router;
